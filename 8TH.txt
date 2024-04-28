@@ -1,0 +1,69 @@
+
+Adversarial Machine Learning
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
+import matplotlib.pyplot as plt
+
+def generate_adversarial_example(image, model, target_class, epsilon=0.01, max_iter=20):
+    """
+    Generates an adversarial example to deceive an image recognition model.
+    :param image: Input image to be perturbed.
+    :param model: Image recognition model to be deceived.
+    :param target_class: Target class label for misclassification.
+    :param epsilon: Perturbation factor (default: 0.01).
+    :param max_iter: Maximum number of iterations for perturbation (default: 20).
+    :return: Perturbed image.
+    """
+    original_image = image.copy()
+    perturbed_image = tf.convert_to_tensor(image)
+    
+    for i in range(max_iter):
+        with tf.GradientTape() as tape:
+            tape.watch(perturbed_image)
+            predictions = model(perturbed_image, training=False)
+            loss = -predictions[0, target_class]  # Maximizing loss for target class
+            
+        gradients = tape.gradient(loss, perturbed_image)
+        perturbed_image = perturbed_image + epsilon * tf.sign(gradients)
+        perturbed_image = tf.clip_by_value(perturbed_image, 0, 1)  # Clip perturbed image values within [0, 1]
+        
+        if i % 5 == 0:
+            print(f"Iteration {i+1}, Loss: {loss.numpy()}, Predicted Class: {decode_predictions(predictions.numpy(), top=1)[0][0][1]}")
+        
+        # Check if the perturbed image is misclassified as the target class
+        if decode_predictions(predictions.numpy(), top=1)[0][0][0] == target_class:
+            print("Adversarial example generated successfully!")
+            break
+    
+    return perturbed_image.numpy()
+
+# Load pre-trained MobileNetV2 model
+model = MobileNetV2(weights='imagenet')
+
+# Load an example image
+image_path = 'example_image.jpg'
+image = tf.keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
+image = tf.keras.preprocessing.image.img_to_array(image)
+image = preprocess_input(image)
+image = np.expand_dims(image, axis=0)
+
+# Generate adversarial example to deceive the model
+target_class = 543  # Target class label for misclassification
+perturbed_image = generate_adversarial_example(image, model, target_class, epsilon=0.01, max_iter=20)
+
+# Plot original and perturbed images
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.title('Original Image')
+plt.imshow(np.squeeze(image))
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.title('Perturbed Image')
+plt.imshow(np.squeeze(perturbed_image))
+plt.axis('off')
+
+plt.show()

@@ -1,0 +1,59 @@
+pentesting 
+
+
+
+import nmap
+import socket
+
+def port_scan(target_ip, ports='1-1024'):
+    """
+    Conducts port scanning on the target IP address.
+    :param target_ip: IP address of the target to be scanned.
+    :param ports: Range of ports to scan (default: 1-1024).
+    :return: List of open ports.
+    """
+    scanner = nmap.PortScanner()
+    scanner.scan(target_ip, ports=ports)
+    open_ports = [port for port in scanner[target_ip]['tcp'].keys() if scanner[target_ip]['tcp'][port]['state'] == 'open']
+    return open_ports
+
+def vulnerability_scan(target_ip):
+    """
+    Conducts vulnerability scanning on the target IP address.
+    :param target_ip: IP address of the target to be scanned.
+    :return: List of detected vulnerabilities.
+    """
+    # Implement vulnerability scanning using tools like Nessus, OpenVAS, or similar
+    # Example code:
+    detected_vulnerabilities = []  # Placeholder
+    # Code to conduct vulnerability scanning and collect results
+    return detected_vulnerabilities
+
+def exploit_vulnerability(target_ip, vulnerability):
+    """
+    Exploits a detected vulnerability on the target IP address.
+    :param target_ip: IP address of the target with the vulnerability.
+    :param vulnerability: Details of the vulnerability to be exploited.
+    """
+    # Implement exploitation of vulnerabilities using tools like Metasploit or custom scripts
+    # Example code:
+    exploit_code = ""  # Placeholder
+    # Code to exploit the vulnerability
+    print(f"Exploiting vulnerability on {target_ip}: {vulnerability}")
+
+# Example usage:
+if __name__ == "__main__":
+    target_ip = "192.168.1.1"
+    
+    # Port scanning
+    open_ports = port_scan(target_ip)
+    print(f"Open ports on {target_ip}: {open_ports}")
+
+    # Vulnerability scanning
+    detected_vulnerabilities = vulnerability_scan(target_ip)
+    print(f"Detected vulnerabilities on {target_ip}: {detected_vulnerabilities}")
+
+    # Exploit vulnerabilities
+    if detected_vulnerabilities:
+        for vulnerability in detected_vulnerabilities:
+            exploit_vulnerability(target_ip, vulnerability)

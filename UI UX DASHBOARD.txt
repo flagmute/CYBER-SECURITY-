@@ -1,0 +1,93 @@
+Live Events and Ticketing Platform
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Events and Ticketing Platform</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <h1>Upcoming Events</h1>
+        <div id="events-list">
+            <!-- Events will be dynamically populated here -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Interactive Seating Chart</h2>
+        <div id="seating-chart">
+            <!-- Interactive seating chart will be displayed here -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Seat Availability</h2>
+        <p id="seat-availability">Loading seat availability...</p>
+    </div>
+
+    <div class="container">
+        <h2>Event Notifications</h2>
+        <p id="event-notifications">No notifications</p>
+    </div>
+
+    <div class="container">
+        <h2>Payment Processing</h2>
+        <button id="purchase-button" onclick="purchaseTickets()">Purchase Tickets</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery library -->
+    <script src="script.js"></script> <!-- Include your JavaScript file -->
+    <script>
+        // Mock data for events and seat availability
+        const events = [
+            { id: 1, name: 'Concert', date: '2024-05-01', venue: 'Arena' },
+            { id: 2, name: 'Sports Game', date: '2024-05-15', venue: 'Stadium' },
+            // More events...
+        ];
+
+        const seatAvailability = {
+            'Concert': { totalSeats: 100, availableSeats: 50 },
+            'Sports Game': { totalSeats: 200, availableSeats: 100 },
+            // More events...
+        };
+
+        // Function to display upcoming events
+        function displayEvents() {
+            const eventsList = document.getElementById('events-list');
+            eventsList.innerHTML = '';
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.innerHTML = `<p>${event.name} - ${event.date} - ${event.venue}</p>`;
+                eventsList.appendChild(eventDiv);
+            });
+        }
+
+        // Function to update seat availability
+        function updateSeatAvailability(eventName) {
+            const availability = seatAvailability[eventName];
+            const seatAvailabilityElement = document.getElementById('seat-availability');
+            seatAvailabilityElement.innerHTML = `Total Seats: ${availability.totalSeats}, Available Seats: ${availability.availableSeats}`;
+        }
+
+        // Function to display event notifications
+        function displayEventNotifications(message) {
+            const eventNotificationsElement = document.getElementById('event-notifications');
+            eventNotificationsElement.innerHTML = message;
+        }
+
+        // Function to handle ticket purchase
+        function purchaseTickets() {
+            // Logic for processing payment and completing the purchase
+            alert('Tickets purchased successfully!');
+        }
+
+        // Initialize the page
+        displayEvents();
+        updateSeatAvailability('Concert'); // Display seat availability for a specific event
+        displayEventNotifications('No notifications'); // Display initial notification message
+    </script>
+</body>
+</html>

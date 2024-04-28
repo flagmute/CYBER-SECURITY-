@@ -1,0 +1,79 @@
+stegnographic file transfer 
+
+
+import os
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from stegano import lsb
+from stegano.lsb.exceptions import LSBSteganoException
+
+def encrypt_file(input_file, output_file, key):
+    """
+    Encrypts a file using AES encryption algorithm.
+    :param input_file: Path to the input file.
+    :param output_file: Path to save the encrypted file.
+    :param key: Encryption key.
+    """
+    # Generate a random initialization vector
+    iv = get_random_bytes(AES.block_size)
+
+    # Create AES cipher object with provided key and initialization vector
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    with open(input_file, 'rb') as f_in:
+        with open(output_file, 'wb') as f_out:
+            # Write the initialization vector to the output file
+            f_out.write(iv)
+
+            # Encrypt the file chunk by chunk
+            while True:
+                chunk = f_in.read(16 * AES.block_size)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b' ' * (16 - len(chunk) % 16)
+                f_out.write(cipher.encrypt(chunk))
+
+def hide_data_in_file(input_file, output_file, data_to_hide):
+    """
+    Hides data within an image file using LSB steganography.
+    :param input_file: Path to the input image file.
+    :param output_file: Path to save the steganographic image.
+    :param data_to_hide: Sensitive data to be hidden.
+    """
+    try:
+        # Hide the data within the image using LSB steganography
+        secret = lsb.hide(input_file, data_to_hide)
+        secret.save(output_file)
+    except LSBSteganoException as e:
+        print("Error:", e)
+
+# Example usage:
+if __name__ == "__main__":
+    # Input for sensitive data to be hidden
+    data_to_hide = "Confidential information: Do not share!"
+
+    # Encryption key
+    key = b'SuperSecretKey123'
+
+    # File types allowed for transfer
+    allowed_file_types = ['.jpg', '.jpeg', '.png', '.bmp']
+
+    # Input and output file paths
+    input_file = 'input.jpg'
+    encrypted_file = 'encrypted_file.enc'
+    stego_image = 'stego_image.png'
+
+    # Check if the input file type is allowed
+    file_ext = os.path.splitext(input_file)[1].lower()
+    if file_ext not in allowed_file_types:
+        print("Error: Unsupported file type.")
+        exit()
+
+    # Encrypt the input file
+    encrypt_file(input_file, encrypted_file, key)
+
+    # Hide the encrypted data within an image file using LSB steganography
+    hide_data_in_file(input_file, stego_image, data_to_hide)
+
+    print("Secure file transfer completed successfully.")

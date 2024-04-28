@@ -1,0 +1,37 @@
+ip vanisher 
+
+
+import requests
+import random
+
+# List of proxy servers
+proxies = [
+    "http://proxy1.example.com:8080",
+    "http://proxy2.example.com:3128",
+    # Add more proxy servers as needed
+]
+
+def send_request_with_proxy():
+    # Randomly choose a proxy server from the list
+proxy_server = random.choice(proxies)
+    print(f"Using proxy server: {proxy_server}")
+
+    # Create a session and set the proxy server
+session = requests.Session()
+    session.proxies = {"http": proxy_server, "https": proxy_server}
+
+    try:
+        # Send a request to a website with the masked IP address
+response = session.get("https://httpbin.org/ip")
+        ip_address = response.json()["origin"]
+        print(f"IP address: {ip_address}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending request: {e}")
+
+    # Close the session
+session.close()
+
+# Test the function
+send_request_with_proxy()
+ 

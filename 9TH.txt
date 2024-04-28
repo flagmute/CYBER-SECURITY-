@@ -1,0 +1,34 @@
+
+Cloud Security Monitoring Dashboard:
+
+import pandas as pd
+from implicit.als import AlternatingLeastSquares
+from scipy.sparse import coo_matrix
+
+# Sample user-item interaction data (user_id, item_id, interaction_score)
+interaction_data = pd.DataFrame({
+    'user_id': [1, 1, 2, 2, 3],
+    'item_id': [101, 102, 101, 103, 102],
+    'interaction_score': [5, 4, 3, 5, 4]
+})
+
+# Convert interaction data to a sparse user-item interaction matrix
+interaction_matrix = coo_matrix((interaction_data['interaction_score'], 
+                                 (interaction_data['user_id'], 
+                                  interaction_data['item_id']))).tocsr()
+
+# Initialize Alternating Least Squares (ALS) model
+model = AlternatingLeastSquares(factors=50, regularization=0.01, iterations=50)
+
+# Train the model on the interaction matrix
+model.fit(interaction_matrix)
+
+# Recommend items for a given user
+user_id = 1
+user_items = interaction_matrix[user_id]
+recommendations = model.recommend(user_id, user_items, N=3)
+
+# Print recommended items
+print("Recommended Items for User", user_id, ":")
+for item_id, score in recommendations:
+    print("Item ID:", item_id, " Score:", score)
